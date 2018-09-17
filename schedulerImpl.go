@@ -20,14 +20,12 @@ func schedulerStub(nodeName string, requireNum int) (int, []string) {
 }
 
 func bestFit(nodeName string, requireNum int) (int, []string) {
-	fmt.Printf("bestFit:: Test1\n")
 	var selectedIDs []string
 	score := 0
 	connectGraphs := nodeConnectGraphs[nodeName]
 	idleDevices := nodeIdleDevices[nodeName]
 	// Search each node
 	for nodeID, _ := range connectGraphs {
-		fmt.Printf("bestFit:: Test2\n")
 		// This node is idle
 		if idleDevices[nodeID] {
 			var selectNode string
@@ -37,14 +35,12 @@ func bestFit(nodeName string, requireNum int) (int, []string) {
 			// Select it (Add to selectedNodes), and start selecting (requireNum-1) devices base on it (suppose it is the start point)
 			selectNode = nodeID
 			for i := 0; i < requireNum; i++ {
-				fmt.Printf("bestFit:: Test3\n")
 				localSelectedNodes[selectNode] = Empty{}
 				localScore += maxSpeed
 				maxSpeed = LinkSpeed(0)
 				selectNode = ""
 				// for each selected node
 				for selected, _ := range localSelectedNodes {
-					fmt.Printf("bestFit:: Test4\n")
 					// Search its neighbor
 					for neig, speed := range connectGraphs[selected].ConnectedDevice {
 						_, ok := localSelectedNodes[neig]
