@@ -34,7 +34,7 @@ func bestFit(nodeName string, requireNum int) (int, []string) {
 			localSelectedNodes := make(map[string]Empty)
 			localScore := LinkSpeed(0)
 			maxSpeed := LinkSpeed(0)
-			// Select it (Add to selectedNodes), and start selecting n devices from it
+			// Select it (Add to selectedNodes), and start selecting (requireNum-1) devices base on it (suppose it is the start point)
 			selectNode = nodeID
 			for i := 0; i < requireNum; i++ {
 				fmt.Printf("bestFit:: Test3\n")
