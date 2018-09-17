@@ -93,21 +93,9 @@ func DeleteNode(nodeName string) {
 }
 
 func AssessTaskAndNode(nodeName string, requireNum int) (int, map[string]string) {
-	score := 0
 	podAnnotation := make(map[string]string)
 	// Scheduler
-	var selectedIDs []string
-	for i := 0; i < requireNum; i++ {
-		switch i {
-		case 0:
-			selectedIDs = append(selectedIDs, "GPU-49a1eb24-cedf-74a0-a03f-c714ce3f9aac")
-			break
-		case 1:
-			selectedIDs = append(selectedIDs, "GPU-67e491a3-e289-fb76-7ec2-f444503730b6")
-			break
-		}
-	}
-	score = 1
+	score, selectedIDs := bestFit(nodeName, requireNum)
 	// Marshal
 	data, err := json.Marshal(selectedIDs)
 	if err != nil {
