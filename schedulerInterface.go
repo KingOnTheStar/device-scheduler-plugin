@@ -5,6 +5,10 @@ import (
 	"fmt"
 )
 
+const (
+	Resourcename = "nvidia.com/gpu"
+)
+
 var nodeConnectGraphs map[string]ConnectGraph
 var nodeHealthyDevices map[string]UsableDeviceMap
 var nodeIdleDevices map[string]UsableDeviceMap
@@ -15,13 +19,17 @@ func HelloDLL(input string) {
 	fmt.Printf("Test2 DLL : %s\n", nodeHealthyDevices)
 }
 
-func InitDLL() {
+func Init() {
 	nodeConnectGraphs = make(map[string]ConnectGraph)
 	nodeHealthyDevices = make(map[string]UsableDeviceMap)
 	nodeIdleDevices = make(map[string]UsableDeviceMap)
 }
 
-func AddNode(nodeName string, annotation map[string]string) {
+func GetResourceName() string {
+	return Resourcename
+}
+
+func OnAddNode(nodeName string, annotation map[string]string) {
 	// Read Topology
 	connectGraph := make(ConnectGraph)
 	err := json.Unmarshal([]byte(annotation["node.dm.alpha.kubernetes.io/Topology"]), &connectGraph)
@@ -50,7 +58,7 @@ func AddNode(nodeName string, annotation map[string]string) {
 	fmt.Printf("AddNode:: Success: %s\n", healthyDevice)
 }
 
-func UpdateNode(nodeName string, annotation map[string]string) {
+func OnUpdateNode(nodeName string, annotation map[string]string) {
 	// Read Topology
 	if _, ok := nodeConnectGraphs[nodeName]; !ok {
 		connectGraph := make(ConnectGraph)
@@ -86,7 +94,7 @@ func UpdateNode(nodeName string, annotation map[string]string) {
 	fmt.Printf("UpdateNode:: Success: %s\n", healthyDevice)
 }
 
-func DeleteNode(nodeName string) {
+func OnDeleteNode(nodeName string) {
 	delete(nodeConnectGraphs, nodeName)
 	delete(nodeHealthyDevices, nodeName)
 	delete(nodeIdleDevices, nodeName)
@@ -95,7 +103,7 @@ func DeleteNode(nodeName string) {
 func AssessTaskAndNode(nodeName string, requireNum int) (int, map[string]string) {
 	podAnnotation := make(map[string]string)
 	// Scheduler
-	score, selectedIDs := bestFit(nodeName, requireNum)
+	score, selectedIDs := schedulerStub(nodeName, requireNum)
 	// Marshal
 	data, err := json.Marshal(selectedIDs)
 	if err != nil {
@@ -106,7 +114,7 @@ func AssessTaskAndNode(nodeName string, requireNum int) (int, map[string]string)
 	return score, podAnnotation
 }
 
-func AddTask(nodeName string, annotation map[string]string) {
+func OnAddTask(nodeName string, annotation map[string]string) {
 	var selectedIDs []string
 	ids, ok := annotation["node.dm.alpha.kubernetes.io/SelectedIDs"]
 	if !ok {
@@ -122,7 +130,7 @@ func AddTask(nodeName string, annotation map[string]string) {
 	}
 }
 
-func RemoveTask(nodeName string, annotation map[string]string) {
+func OnRemoveTask(nodeName string, annotation map[string]string) {
 	var selectedIDs []string
 	ids, ok := annotation["node.dm.alpha.kubernetes.io/SelectedIDs"]
 	if !ok {
